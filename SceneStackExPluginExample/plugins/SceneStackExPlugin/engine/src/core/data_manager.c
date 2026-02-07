@@ -50,6 +50,7 @@ const far_ptr_t spritesheet_none_far = TO_FAR_PTR_T(spritesheet_none);
 
 scene_stack_item_t scene_stack[SCENE_STACK_SIZE];
 scene_stack_item_t * scene_stack_ptr;
+UBYTE scene_stack_count;
 
 UBYTE scene_sprites_base_tiles[MAX_SCENE_SPRITES];
 
@@ -57,6 +58,7 @@ void load_init(void) BANKED {
     actors_len = 0;
     player_sprite_len = 0;
     scene_stack_ptr = scene_stack;
+    scene_stack_count = 0;
 }
 
 void load_bkg_tileset(const tileset_t* tiles, UBYTE bank) BANKED {

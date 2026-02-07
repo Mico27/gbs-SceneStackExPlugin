@@ -84,7 +84,10 @@ typedef struct scene_stack_item_ex_t {
     actor_stack_item_t actor_stack_item;
     projectile_stack_item_t projectile_stack_item;
     camera_stack_item_t camera_stack_item;
+    uint16_t rand_seed;
 } scene_stack_item_ex_t;
+
+extern uint16_t __rand_seed;
 
 scene_stack_item_ex_t __at(0xA000u) scene_stacks_ex[MAX_SCENE_STACK_EX_COUNT];
 scene_stack_item_ex_t * scene_stack_ex_ptr;
@@ -168,6 +171,7 @@ void push_scene_stack_ex(void) BANKED {
         push_actor_stack_item();
         push_projectile_stack_item();
         push_camera_stack_item();
+        scene_stack_ex_ptr->rand_seed = __rand_seed;
         scene_stack_ex_ptr++;
         scene_stack_ex_count++;
         //SWITCH_RAM_BANK(0, RAM_BANKS_ONLY);
@@ -259,6 +263,7 @@ UBYTE pop_scene_stack_ex(void) BANKED {
         pop_actor_stack_item();
         pop_projectile_stack_item();
         pop_camera_stack_item();
+        __rand_seed = scene_stack_ex_ptr->rand_seed;
         
         return TRUE;
     }

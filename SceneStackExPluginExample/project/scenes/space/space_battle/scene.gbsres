@@ -169,10 +169,17 @@
         ],
         "override": true,
         "__scriptTabs": "press",
-        "__collapse": true
+        "__collapse": false
       },
       "children": {
         "true": [
+          {
+            "command": "EVENT_RNG_SEED",
+            "args": {
+              "__collapse": true
+            },
+            "id": "7b892fe0-e933-4400-85ed-c4f6b2ae5ac8"
+          },
           {
             "command": "EVENT_SWITCH",
             "args": {
@@ -209,7 +216,7 @@
                 {
                   "command": "EVENT_PUSH_SCENE_STACK_EX",
                   "args": {
-                    "__scriptTabs": "push"
+                    "__scriptTabs": "pop"
                   },
                   "children": {
                     "push": [
@@ -265,6 +272,32 @@
                           "__collapse": true
                         },
                         "id": "ffbc6282-03ce-4435-8ba2-3342a4e8b287"
+                      },
+                      {
+                        "command": "EVENT_SET_VALUE",
+                        "args": {
+                          "variable": "23",
+                          "value": {
+                            "type": "property",
+                            "target": "camera",
+                            "property": "pxpos"
+                          },
+                          "__collapse": true
+                        },
+                        "id": "1c6d86ab-cc5f-4f3f-8487-f4c0c6a79714"
+                      },
+                      {
+                        "command": "EVENT_SET_VALUE",
+                        "args": {
+                          "variable": "24",
+                          "value": {
+                            "type": "property",
+                            "target": "camera",
+                            "property": "pypos"
+                          },
+                          "__collapse": true
+                        },
+                        "id": "e7678813-3f7e-4ad3-9870-5f6f7df13f02"
                       }
                     ],
                     "pop": [
@@ -297,7 +330,9 @@
                       {
                         "command": "EVENT_FADE_IN",
                         "args": {
-                          "speed": "2"
+                          "speed": 1,
+                          "__comment": true,
+                          "__collapse": true
                         },
                         "id": "2529f38f-b034-4a66-b664-af9fbf7d5010"
                       }
@@ -384,16 +419,34 @@
                   "id": "a0093c99-969b-4b44-be34-1590cb6f7617"
                 },
                 {
-                  "command": "EVENT_CAMERA_LOCK",
+                  "command": "EVENT_THREAD_START",
                   "args": {
-                    "speed": 1,
-                    "axis": [
-                      "x",
-                      "y"
-                    ],
+                    "variable": "25",
+                    "__scriptTabs": "true",
                     "__collapse": true
                   },
-                  "id": "3867b32a-73b8-40c1-8155-e9424807c6e2"
+                  "children": {
+                    "true": [
+                      {
+                        "command": "EVENT_CAMERA_MOVE_TO",
+                        "args": {
+                          "x": {
+                            "type": "expression",
+                            "value": "$23$ - 80"
+                          },
+                          "y": {
+                            "type": "expression",
+                            "value": "$24$ - 72"
+                          },
+                          "speed": 4,
+                          "units": "pixels",
+                          "__collapse": false
+                        },
+                        "id": "0c9e209a-ec2a-456c-b316-0714605c9739"
+                      }
+                    ]
+                  },
+                  "id": "c967b0b5-d5eb-49ed-9d5e-226348e55037"
                 },
                 {
                   "command": "EVENT_ACTOR_MOVE_TO",
@@ -415,23 +468,25 @@
                       "x",
                       "y"
                     ],
-                    "moveType": "horizontal",
+                    "moveType": "diagonal",
                     "units": "pixels",
                     "__collapse": true
                   },
                   "id": "f3e29438-ab0a-43e3-958c-d0f3e32968d1"
                 },
                 {
-                  "command": "EVENT_CAMERA_LOCK",
+                  "command": "EVENT_GBVM_SCRIPT",
                   "args": {
-                    "speed": 0,
-                    "axis": [
-                      "x",
-                      "y"
+                    "script": ";Wait for camera move to to finish before continuing\nVM_JOIN VAR_TEMPTHREADHANDLE",
+                    "references": [
+                      {
+                        "type": "variable",
+                        "id": "25"
+                      }
                     ],
                     "__collapse": true
                   },
-                  "id": "0720537d-d240-4596-823b-e838acc44eb4"
+                  "id": "5d4caa14-2f00-43ea-8bd2-f393e2e70a0f"
                 },
                 {
                   "command": "EVENT_SCENE_UPDATE_RESUME",
@@ -443,7 +498,7 @@
                 {
                   "command": "EVENT_POP_SCENE_STACK_EX",
                   "args": {
-                    "fadeSpeed": "2"
+                    "fadeSpeed": 0
                   },
                   "id": "400bd61e-9c37-4292-8ebd-1396acd4901d"
                 }

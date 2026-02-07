@@ -49,7 +49,7 @@
     {
       "command": "EVENT_POP_SCENE_STACK_EX",
       "args": {
-        "fadeSpeed": "2"
+        "fadeSpeed": 2
       },
       "id": "fbea4b52-2204-4952-9abb-1394c3a6ac47"
     }

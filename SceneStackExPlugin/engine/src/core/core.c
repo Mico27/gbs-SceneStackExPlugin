@@ -153,7 +153,6 @@ void process_VM(void) {
                         continue;
                     }
                     case EXCEPTION_POP_SCENE_STACK: {
-                        fade_out_modal();
                         // remove previous LCD ISR's
                         remove_LCD_ISRs();
                         // pop stack                        

@@ -78,13 +78,14 @@
                 "value": 0
               },
               "y": {
-                "type": "number",
-                "value": -2
+                "type": "expression",
+                "value": "-rnd(4)"
               },
               "moveType": "vertical",
               "useCollisions": false,
               "collideWith": [],
-              "__section": "movement"
+              "__section": "movement",
+              "__collapse": false
             }
           },
           {
@@ -97,13 +98,14 @@
                 "value": 0
               },
               "y": {
-                "type": "number",
-                "value": 2
+                "type": "expression",
+                "value": "rnd(4)"
               },
               "moveType": "vertical",
               "useCollisions": false,
               "collideWith": [],
-              "__section": "movement"
+              "__section": "movement",
+              "__collapse": false
             }
           },
           {
@@ -126,7 +128,8 @@
               "otherActorId": "$self$",
               "loopAnim": true,
               "destroyOnHit": true,
-              "__section": "projectile"
+              "__section": "projectile",
+              "__collapse": false
             }
           },
           {
@@ -139,13 +142,14 @@
                 "value": 0
               },
               "y": {
-                "type": "number",
-                "value": 2
+                "type": "expression",
+                "value": "rnd(4)"
               },
               "moveType": "vertical",
               "useCollisions": false,
               "collideWith": [],
-              "__section": "movement"
+              "__section": "movement",
+              "__collapse": false
             }
           },
           {
@@ -158,13 +162,14 @@
                 "value": 0
               },
               "y": {
-                "type": "number",
-                "value": -2
+                "type": "expression",
+                "value": "-rnd(4)"
               },
               "moveType": "vertical",
               "useCollisions": false,
               "collideWith": [],
-              "__section": "movement"
+              "__section": "movement",
+              "__collapse": false
             }
           }
         ]

@@ -64,7 +64,7 @@
                             "value": 0
                           },
                           "direction": "",
-                          "fadeSpeed": "2"
+                          "fadeSpeed": 2
                         }
                       }
                     ],

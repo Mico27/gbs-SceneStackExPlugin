@@ -117,6 +117,26 @@
       "symbol": "var_test_script_arg_0_actor"
     },
     {
+      "id": "23",
+      "name": "CheckPointCamX",
+      "symbol": "var_checkpointcamx"
+    },
+    {
+      "id": "24",
+      "name": "CheckPointCamY",
+      "symbol": "var_checkpointcamy"
+    },
+    {
+      "id": "25",
+      "name": "TempThreadHandle",
+      "symbol": "var_tempthreadhandle"
+    },
+    {
+      "id": "26",
+      "name": "STACKSIZE",
+      "symbol": "var_stacksize"
+    },
+    {
       "id": "871ea302-1cc1-463c-b9d7-530aac38fe81__L0",
       "name": "Spoken to gardener",
       "symbol": "var_spoken_to_gardener"

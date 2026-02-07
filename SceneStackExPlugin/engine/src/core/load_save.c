@@ -44,12 +44,12 @@ const save_point_t save_points[] = {
     SAVEPOINT(music_current_track, 12),
     SAVEPOINT(music_events, 13),
     // scene
-    SAVEPOINT(current_scene, 14), SAVEPOINT(scene_stack_ptr, 15), SAVEPOINT(scene_stack, 16),
+    SAVEPOINT(current_scene, 14), SAVEPOINT(scene_stack_ptr, 15), SAVEPOINT(scene_stack, 16), SAVEPOINT(scene_stack_count, 17),
     // actors
-    SAVEPOINT(actors, 17),
-    SAVEPOINT(actors_active_head, 18), SAVEPOINT(actors_inactive_head, 19), SAVEPOINT(player_moving, 20), SAVEPOINT(player_collision_actor, 21),
+    SAVEPOINT(actors, 18),
+    SAVEPOINT(actors_active_head, 19), SAVEPOINT(actors_inactive_head, 20), SAVEPOINT(player_moving, 21), SAVEPOINT(player_collision_actor, 22),
     // system
-    SAVEPOINT(__rand_seed, 22),
+    SAVEPOINT(__rand_seed, 23),
     // terminator
     SAVEPOINTS_END
 };

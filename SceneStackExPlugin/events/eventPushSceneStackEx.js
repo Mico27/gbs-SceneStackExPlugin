@@ -1,14 +1,19 @@
+const l10n = require("../helpers/l10n").default;
 export const id = "EVENT_PUSH_SCENE_STACK_EX";
-export const name = "Push scene stack ex";
-export const groups = ["Stack extended"];
+export const name = l10n("FIELD_SCENE_PUSH_STATE_DESCRIPTION") + " (EXTENDED)";
+export const description = l10n("EVENT_SCENE_PUSH_STATE_DESC") + " (EXTENDED)";
+export const groups = ["EVENT_GROUP_SCENE"];
+export const subGroups = {
+  EVENT_GROUP_SCENE: "EVENT_GROUP_SCENE_STACK",
+};
 
 export const autoLabel = (fetchArg) => {
-    return `Push scene stack ex`;
+    return l10n("FIELD_SCENE_PUSH_STATE_DESCRIPTION") + " (EXTENDED)";
 };
 
 export const fields = [
     {
-        label: "Push scene to stack",
+        label: l10n("FIELD_SCENE_PUSH_STATE_DESCRIPTION") + " (EXTENDED)",
     },
     {
         key: "__scriptTabs",
