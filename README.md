@@ -1,5 +1,5 @@
 # gbs-SceneStackExPlugin
-Extended Scene stack plugin for GBStudio
+Extended Scene stack plugin for GBStudio (Requires GBStudio 4.2.0 Beta3)
 
 Saving the scene in stack in GBStudio only saves the scene address and the Player position into the stack.
 This plugin adds an extanded version saving the scene to the stack which puts pretty much everything from the scene.
