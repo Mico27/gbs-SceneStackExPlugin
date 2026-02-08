@@ -121,15 +121,28 @@ UBYTE data_load(UBYTE slot) BANKED {
     UBYTE data_bank, *save_data = data_slot_address(slot, &data_bank);
     if (save_data == NULL) return FALSE;
     SWITCH_RAM_BANK(data_bank, RAM_BANKS_ONLY);
-    if (SIGN_BY_PTR(save_data) != save_signature) return FALSE;
+    if (SIGN_BY_PTR(save_data) != save_signature){
+        SWITCH_RAM_BANK(0, RAM_BANKS_ONLY);
+        return FALSE;
+    }
     // seek to the first block
     save_data += sizeof(save_signature) + sizeof(save_blob_size);
     // load blocks
     for(const save_point_t * point = save_points; (point->target); point++) {
         // check chunk size
-        if (*(size_t*)save_data != point->size) return FALSE; else save_data += sizeof(point->size);
+        if (*(size_t*)save_data != point->size){
+            SWITCH_RAM_BANK(0, RAM_BANKS_ONLY);
+            return FALSE; 
+        } else {
+            save_data += sizeof(point->size);
+        }
         // check chunk id
-        if (*(uint8_t*)save_data != point->id) return FALSE; else save_data += sizeof(point->id);
+        if (*(uint8_t*)save_data != point->id){
+            SWITCH_RAM_BANK(0, RAM_BANKS_ONLY);
+            return FALSE; 
+        } else {
+            save_data += sizeof(point->id);
+        }
         // copy chunk data
         memcpy(point->target, save_data, point->size);
         save_data += point->size;
@@ -160,7 +173,10 @@ UBYTE data_peek(UBYTE slot, UINT16 idx, UWORD count, UINT16 * dest) BANKED {
     UBYTE data_bank, *save_data = data_slot_address(slot, &data_bank);
     if (save_data == NULL) return FALSE;
     SWITCH_RAM_BANK(data_bank, RAM_BANKS_ONLY);
-    if (SIGN_BY_PTR(save_data) != save_signature) return FALSE;
+    if (SIGN_BY_PTR(save_data) != save_signature){
+        SWITCH_RAM_BANK(0, RAM_BANKS_ONLY);
+        return FALSE;
+    }
     if (count) memcpy(dest, save_data + (sizeof(save_signature) + sizeof(save_blob_size) + sizeof(size_t) + sizeof(uint8_t)) + (idx << 1), count << 1);
     SWITCH_RAM_BANK(0, RAM_BANKS_ONLY);
     return TRUE;
