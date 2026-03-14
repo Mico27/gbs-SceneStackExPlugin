@@ -16,7 +16,7 @@
           "Mico27/MetaTilePlugin"
         ]
       },
-      "use": "ConfigLoadSavePlugin_FadeStreetPlugin_MetaTilePlugin"
+      "use": "Con_F_M"
     },
     {
       "when": {
@@ -26,7 +26,7 @@
           "MetaTilePlugin"
         ]
       },
-      "use": "ConfigLoadSavePlugin_FadeStreetPlugin_MetaTilePlugin"
+      "use": "Con_F_M"
     },
     {
       "when": {
@@ -35,7 +35,7 @@
           "Mico27/FadeStreetPlugin"
         ]
       },
-      "use": "ConfigLoadSavePlugin_FadeStreetPlugin"
+      "use": "Con_F"
     },
     {
       "when": {
@@ -44,7 +44,7 @@
           "FadeStreetPlugin"
         ]
       },
-      "use": "ConfigLoadSavePlugin_FadeStreetPlugin"
+      "use": "Con_F"
     },
     {
       "when": {
@@ -53,7 +53,7 @@
           "Mico27/MetaTilePlugin"
         ]
       },
-      "use": "ConfigLoadSavePlugin_MetaTilePlugin"
+      "use": "Con_M"
     },
     {
       "when": {
@@ -62,7 +62,7 @@
           "MetaTilePlugin"
         ]
       },
-      "use": "ConfigLoadSavePlugin_MetaTilePlugin"
+      "use": "Con_M"
     },
     {
       "when": {
@@ -71,7 +71,7 @@
           "Mico27/MetaTilePlugin"
         ]
       },
-      "use": "FadeStreetPlugin_MetaTilePlugin"
+      "use": "F_M"
     },
     {
       "when": {
@@ -80,7 +80,7 @@
           "MetaTilePlugin"
         ]
       },
-      "use": "FadeStreetPlugin_MetaTilePlugin"
+      "use": "F_M"
     },
     {
       "when": {
@@ -88,7 +88,7 @@
           "Mico27/ConfigLoadSavePlugin"
         ]
       },
-      "use": "ConfigLoadSavePlugin"
+      "use": "Con"
     },
     {
       "when": {
@@ -96,7 +96,7 @@
           "ConfigLoadSavePlugin"
         ]
       },
-      "use": "ConfigLoadSavePlugin"
+      "use": "Con"
     },
     {
       "when": {
@@ -104,7 +104,7 @@
           "Mico27/FadeStreetPlugin"
         ]
       },
-      "use": "FadeStreetPlugin"
+      "use": "F"
     },
     {
       "when": {
@@ -112,7 +112,7 @@
           "FadeStreetPlugin"
         ]
       },
-      "use": "FadeStreetPlugin"
+      "use": "F"
     },
     {
       "when": {
@@ -120,7 +120,7 @@
           "Mico27/MetaTilePlugin"
         ]
       },
-      "use": "MetaTilePlugin"
+      "use": "M"
     },
     {
       "when": {
@@ -128,7 +128,7 @@
           "MetaTilePlugin"
         ]
       },
-      "use": "MetaTilePlugin"
+      "use": "M"
     }
   ]
 }
