@@ -321,7 +321,7 @@ UBYTE load_scene(const scene_t * scene, UBYTE bank, UBYTE init_data) BANKED {
             }
         }
     }
-    if (!vm_pop_scene_stack_state) { 
+    if (!vm_pop_scene_stack_state) {
         // Init and Load projectiles
         projectiles_init();
         if (projectiles_len  != 0) {

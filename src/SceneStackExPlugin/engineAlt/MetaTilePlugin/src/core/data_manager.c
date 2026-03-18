@@ -340,6 +340,7 @@ UBYTE load_scene(const scene_t * scene, UBYTE bank, UBYTE init_data) BANKED {
     if (triggers_len != 0) {
         MemcpyBanked(&triggers, scn.triggers.ptr, sizeof(trigger_t) * triggers_len, scn.triggers.bank);
     }
+
     if (!vm_pop_scene_stack_state) {
         metatile_reset();
     }
