@@ -27,7 +27,7 @@
       "command": "EVENT_IF",
       "args": {
         "variable": "L0",
-        "__collapseElse": true,
+        "__collapseElse": false,
         "condition": {
           "type": "variable",
           "value": "L0"

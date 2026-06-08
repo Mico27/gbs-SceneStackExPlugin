@@ -323,7 +323,7 @@
                           "duration": 0.5,
                           "wait": true,
                           "effect": 1,
-                          "__collapse": true
+                          "__collapse": false
                         },
                         "id": "fa38ee76-0621-4166-b63a-3a5db4123d38"
                       },
@@ -377,8 +377,8 @@
                     "frequency": 200,
                     "duration": 0.5,
                     "wait": true,
-                    "effect": 8,
-                    "__collapse": true
+                    "effect": 1,
+                    "__collapse": false
                   },
                   "id": "2e35928e-57b5-484c-b4dc-700abbe1b961"
                 },
@@ -423,7 +423,7 @@
                   "args": {
                     "variable": "25",
                     "__scriptTabs": "true",
-                    "__collapse": true
+                    "__collapse": false
                   },
                   "children": {
                     "true": [
