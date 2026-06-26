@@ -12,7 +12,7 @@ Index: src\core\data_manager.c
  #define ALLOC_BKG_TILES_TOWARDS_SPR
  
  #define EMOTE_SPRITE_SIZE       4
-@@ -50,20 +51,22 @@
+@@ -50,15 +51,17 @@
  const far_ptr_t spritesheet_none_far = TO_FAR_PTR_T(spritesheet_none);
  
  scene_stack_item_t scene_stack[SCENE_STACK_SIZE];
@@ -29,14 +29,7 @@ Index: src\core\data_manager.c
  }
  
  void load_bkg_tileset(const tileset_t* tiles, UBYTE bank) BANKED {
--	#ifdef DISABLE_TILESET_LOAD_ON_TRANSITION
--        if (((!bank) && (!tiles)) || is_transitioning_scene) return;    
-+    #ifdef DISABLE_TILESET_LOAD_ON_TRANSITION
-+        if (((!bank) && (!tiles)) || is_transitioning_scene) return;
-     #else
-         if ((!bank) && (!tiles)) return;
-     #endif
-     UWORD n_tiles = ReadBankedUWORD(&(tiles->n_tiles), bank);
+     #ifdef DISABLE_TILESET_LOAD_ON_TRANSITION
 @@ -247,10 +250,12 @@
      #endif
              PLAYER.sprite = scn.player_sprite;
