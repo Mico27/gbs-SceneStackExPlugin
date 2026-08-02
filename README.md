@@ -70,10 +70,10 @@ The push event does not trigger a scene change. After saving the state snapshot,
 Later, when any script calls the pop event:
 
 1. The snapshot is restored — including the VM context that was running the push event.
-2. `load_scene` is called with `init_data = FALSE` to reload VRAM without reinitialising actors or running the scene init script.
-3. The script resumes executing right after the `vm_push_scene_stack_ex` call — `vm_poll_stack_pop` now returns `1`, so the **On pop** subscript runs instead of **On push**.
+2. The scene is reloaded — VRAM is restored without reinitialising actors or running the scene init script.
+3. The script resumes right after the push event, and this time takes the **On pop** branch instead of **On push**.
 
-This mechanism means the same instruction sequence in the compiled script handles both the push and the pop paths, controlled entirely by a single flag set by the runtime.
+This is why one event carries both subscripts: the same point in your script handles the push and the pop, and the runtime decides which branch runs.
 
 ---
 
