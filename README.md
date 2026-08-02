@@ -22,10 +22,9 @@ The plugin also adds failsafe guards to the standard scene stack so that overflo
 
 1. [Concepts](#concepts)
 2. [Project Setup](#project-setup)
-3. [Technicalities and Restrictions](#technicalities-and-restrictions)
+3. [Size Limits and Restrictions](#size-limits-and-restrictions)
 4. [Events Reference](#events-reference)
-5. [Inner Workings](#inner-workings)
-6. [Memory Footprint](#memory-footprint)
+5. [Memory Footprint](#memory-footprint)
 
 ---
 
@@ -85,7 +84,7 @@ This mechanism means the same instruction sequence in the compiled script handle
 
 ---
 
-## Technicalities and Restrictions
+## Size Limits and Restrictions
 
 ### Extended Stack Depth: 2 Entries
 
@@ -116,21 +115,13 @@ Both the pop and pop-all events are guarded: if the extended stack is empty they
 
 ### Push When Stack Is Full Does Nothing
 
-If `scene_stack_ex_count` is already at the maximum (2), `vm_push_scene_stack_ex` silently does nothing. No error is raised.
+If the extended stack is already at its maximum of 2 entries, the push silently does nothing. No error is raised.
 
 ### Modified Engine Files
 
-| File | Change |
-|---|---|
-| `core.c` | Handles `EXCEPTION_PUSH_SCENE_STACK` and `EXCEPTION_POP_SCENE_STACK`; calls `scene_stack_init()` in `core_reset` |
-| `data_manager.c` | Adds `scene_stack_count` tracking to standard `load_init`; includes `scene_stack_ex.h` |
-| `vm_scene.c` | Adds overflow/underflow guards to standard push/pop functions |
-| `load_save.c` | Includes modified save point list (extended stack is excluded from saves) |
-| `include/data_manager.h` | Exports `scene_stack_count` and standard stack symbols |
-| `include/vm_exceptions.h` | Adds exception codes 5 (`EXCEPTION_PUSH_SCENE_STACK`) and 6 (`EXCEPTION_POP_SCENE_STACK`) |
-| `include/vm.i` | Adds the same two exception code constants to the VM assembler namespace |
-| NEW `scene_stack_ex.c` | All extended stack logic |
-| NEW `scene_stack_ex.h` | Public interface and `MAX_SCENE_STACK_EX_COUNT` constant |
+The plugin patches several stock engine files — scene loading, the scene-change exception handling, the built-in push/pop events and the save point list — and adds its own extended-stack files. Another plugin that patches the same stock files needs a merged build or a matching compatibility variant.
+
+The extended stack is deliberately **excluded from saves**.
 
 ---
 
@@ -220,150 +211,6 @@ Stores the current number of entries in the **standard** built-in scene stack (0
 
 ---
 
-## Inner Workings
-
-### New Exception Codes
-
-The plugin adds two new VM exception codes:
-
-```c
-EXCEPTION_PUSH_SCENE_STACK = 5
-EXCEPTION_POP_SCENE_STACK  = 6
-```
-
-These are defined in both the C header (`vm_exceptions.h`) and the assembler constants file (`vm.i`) so the VM bytecode compiler can reference them. They work identically to the built-in scene-change exception mechanism: a native function sets `vm_exception_code` and the main game loop in `core.c` handles it at the top of the next iteration.
-
-### `push_scene_stack_ex` — Saving the Snapshot
-
-`vm_push_scene_stack_ex` raises `EXCEPTION_PUSH_SCENE_STACK`. The `core.c` exception handler calls `push_scene_stack_ex()` and then `continue`s — meaning **no scene reload occurs**. The game loop simply resumes.
-
-`push_scene_stack_ex` saves state into `scene_stacks_ex[scene_stack_ex_count]` at `0xA000` (SRAM):
-
-```c
-void push_scene_stack_ex(void) BANKED {
-    if (scene_stack_ex_count < MAX_SCENE_STACK_EX_COUNT) {
-        scene_stack_ex_ptr->scene      = current_scene;
-        scene_stack_ex_ptr->player_pos = PLAYER.pos;
-        scene_stack_ex_ptr->player_dir = PLAYER.dir;
-        push_vm_stack_item();        // CTXS, context_stacks, list pointers, lock state
-        push_event_stack_item();     // input events, timer events/values
-        push_music_stack_item();     // current track, music events
-        push_actor_stack_item();     // all actors, list heads/tails, player state
-        push_projectile_stack_item();// all projectiles and defs
-        push_camera_stack_item();    // camera x/y, clamp, offset, deadzone, settings
-        scene_stack_ex_ptr->rand_seed = __rand_seed;
-        scene_stack_ex_ptr++;
-        scene_stack_ex_count++;
-    }
-}
-```
-
-### `pop_scene_stack_ex` — Restoring the Snapshot
-
-`vm_pop_scene_stack_ex` raises `EXCEPTION_POP_SCENE_STACK`. The handler:
-
-```c
-case EXCEPTION_POP_SCENE_STACK: {
-    remove_LCD_ISRs();
-    vm_pop_scene_stack_state = pop_scene_stack_ex();
-    load_scene(current_scene.ptr, current_scene.bank, FALSE);
-    fade_in = FALSE;
-    break;
-}
-```
-
-`pop_scene_stack_ex` decrements the pointer and restores all fields in reverse order:
-
-```c
-UBYTE pop_scene_stack_ex(void) BANKED {
-    if (scene_stack_ex_count > 0) {
-        scene_stack_ex_count--;
-        scene_stack_ex_ptr--;
-        current_scene  = scene_stack_ex_ptr->scene;
-        PLAYER.pos     = scene_stack_ex_ptr->player_pos;
-        PLAYER.dir     = scene_stack_ex_ptr->player_dir;
-        pop_vm_stack_item();
-        pop_event_stack_item();
-        pop_music_stack_item();
-        pop_actor_stack_item();
-        pop_projectile_stack_item();
-        pop_camera_stack_item();
-        __rand_seed = scene_stack_ex_ptr->rand_seed;
-        return TRUE;
-    }
-    return FALSE;
-}
-```
-
-`load_scene(..., FALSE)` then reloads the background and sprite VRAM data from ROM without reinitialising actor positions or running the scene init script — since all actor state was already restored from the snapshot.
-
-After the exception is handled, the main loop checks `vm_pop_scene_stack_state`:
-
-```c
-if (!vm_pop_scene_stack_state) {
-    player_init();
-    state_init();
-}
-```
-
-Because the flag is `TRUE`, `player_init` and `state_init` are skipped. The restored VM contexts take over immediately, and music is restarted by the pop path if the track has changed.
-
-### The Push/Pop Branching Model in the Compiled Script
-
-The `eventPushSceneStackEx.js` event compiles to roughly the following sequence:
-
-```
-vm_push_scene_stack_ex       ; raises EXCEPTION_PUSH_SCENE_STACK, then continues
-vm_poll_stack_pop [hasPoppedRef] ; reads vm_pop_scene_stack_state → clears it
-if hasPoppedRef == 1 → jump popLabel
-  [On push script]
-  jump endLabel
-popLabel:
-  [On pop script]
-  (fade in if on-pop script is empty)
-endLabel:
-```
-
-`vm_poll_stack_pop` reads `vm_pop_scene_stack_state` into a local variable and immediately clears the flag. On the first pass (after the push), the flag is 0 — the "On push" path runs. When the snapshot is later restored via `pop_scene_stack_ex`, the VM state is rewound to the instruction right after `vm_push_scene_stack_ex`, `vm_pop_scene_stack_state` is `TRUE`, and `vm_poll_stack_pop` returns 1 — the "On pop" path runs.
-
-This means both paths share a single compiled script and the branching costs only one additional `vm_poll_stack_pop` call per push event.
-
-### Music Restoration
-
-`pop_music_stack_item` compares the saved track to the current one before overwriting:
-
-```c
-if (prev_music_current_track_bank != music_current_track_bank ||
-    prev_music_current_track != music_current_track) {
-    if (music_current_track_bank != MUSIC_STOP_BANK) {
-        music_next_track = music_current_track;
-    } else {
-        music_sound_cut();
-    }
-}
-```
-
-If the track that was playing when the push happened is different from whatever is playing when the pop occurs, the saved track is queued to restart. If the saved state had no music, `music_sound_cut()` stops playback.
-
-### `vm_pop_all_scene_stack_ex`
-
-Pop-all is implemented by collapsing the pointer back to just one entry above the base and setting count to 1, then raising the same `EXCEPTION_POP_SCENE_STACK`:
-
-```c
-void vm_pop_all_scene_stack_ex(void) OLDCALL BANKED {
-    if (scene_stack_ex_count > 0) {
-        scene_stack_ex_ptr = scene_stacks_ex;
-        scene_stack_ex_ptr++;
-        scene_stack_ex_count = 1;
-        vm_exception_code = EXCEPTION_POP_SCENE_STACK;
-    }
-}
-```
-
-This discards all entries above the first one and then pops to the oldest saved scene, executing its **On pop** script.
-
----
-
 ## Memory Footprint
 
 Measured against the stock GB Studio **4.3.0-e1** engine (per-file SDCC compile with GB Studio's build flags, default engine settings). Values are the plugin's *delta* versus the stock engine; DMG build, with CGB noted where it differs. ROM cost lands in banked ROM (GB Studio's autobanker spreads it across switchable banks); using the plugin's events additionally compiles a few bytes of GBVM script per call into your project's script banks.
@@ -373,7 +220,7 @@ Measured against the stock GB Studio **4.3.0-e1** engine (per-file SDCC compile 
 | WRAM | +5 bytes |
 | ROM | +1,867 bytes |
 
-- **WRAM:** 5 bytes (stack pointer/counter plus one byte in `data_manager.c`).
+- **WRAM:** 5 bytes — the extended stack pointer and counter.
 - **Engine WRAM headroom:** the stock GB Studio 4.3.0 engine leaves about **854 bytes** of WRAM free (usable engine WRAM is 7,776 bytes at 0xC0A0–0xDF00; the stock engine uses 6,922 bytes). With this plugin installed roughly **849 bytes** remain. This figure does not depend on how many global variables your project defines: the script memory array has a fixed size of VM_HEAP_SIZE + (VM_MAX_CONTEXTS × VM_CONTEXT_STACK_SIZE) words — 768 + 16 × 64 = 1,792 words (3,584 bytes) with stock engine settings.
 - **SRAM:** yes — the extended scene stack lives in SRAM bank 0: 2 snapshot slots × 4,018 bytes = **8,036 bytes** at 0xA000 (with default engine settings; snapshot size scales with MAX_ACTORS, VM context count, etc.). Game saves are relocated to SRAM banks 1–3, so a cartridge with at least 32 KiB SRAM is required if your game uses save slots.
 
