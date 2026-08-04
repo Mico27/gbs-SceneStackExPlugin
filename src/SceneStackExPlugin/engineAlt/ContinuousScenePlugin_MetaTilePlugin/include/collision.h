@@ -52,7 +52,6 @@ extern uint8_t __at(SRAM_COLLISION_DATA_PTR) sram_collision_data[COLLISION_DATA_
 extern uint8_t __at(SRAM_MAP_DATA_PTR) sram_map_data[MAX_MAP_DATA_SIZE];
 extern UBYTE metatile_collision_bank;
 extern UBYTE image_tile_width_bit;
-extern UBYTE scene_transition_enabled;
 
 /**
  * Check if point is within positioned bounding box.
@@ -106,7 +105,7 @@ inline UBYTE tile_at(UBYTE tx, UBYTE ty) {
             return ReadBankedUBYTE(collision_ptr + (ty * (UINT16)image_tile_width) + tx, collision_bank);
         }
     }
-    return (scene_transition_enabled)? 0: COLLISION_ALL;
+    return COLLISION_ALL;
 }
 
 /**
