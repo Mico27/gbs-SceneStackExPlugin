@@ -3,23 +3,23 @@ Index: src/core/data_manager.c
 --- src/core/data_manager.c
 +++ src/core/data_manager.c
 @@ -1,5 +1,5 @@
--#pragma bank 255
-+﻿#pragma bank 255
+-﻿#pragma bank 255
++#pragma bank 255
  
  #include <string.h>
  
  #include "system.h"
-@@ -15,8 +15,9 @@
- #include "palette.h"
- #include "data/spritesheet_none.h"
- #include "data/data_bootstrap.h"
+@@ -18,8 +18,9 @@
+ #include "meta_tiles.h"
+ #include "data/states_defines.h"
+ #include "continuous_scene.h"
  #include "macro.h"
 +#include "scene_stack_ex.h"
  
  #define ALLOC_BKG_TILES_TOWARDS_SPR
  
  #define EMOTE_SPRITE_SIZE       4
-@@ -48,15 +49,17 @@
+@@ -51,15 +52,17 @@
  const far_ptr_t spritesheet_none_far = TO_FAR_PTR_T(spritesheet_none);
  
  scene_stack_item_t scene_stack[SCENE_STACK_SIZE];
@@ -36,23 +36,23 @@ Index: src/core/data_manager.c
  }
  
  void load_bkg_tileset(const tileset_t* tiles, UBYTE bank) BANKED {
-     if ((!bank) && (!tiles)) return;
-@@ -235,10 +238,12 @@
-         // Load player
-         PLAYER.sprite = scn.player_sprite;
-         UBYTE n_loaded = load_sprite(PLAYER.base_tile = 0, scn.player_sprite.ptr, scn.player_sprite.bank);
-         allocated_sprite_tiles = (n_loaded > scn.reserve_tiles) ? n_loaded : scn.reserve_tiles;
--        load_animations(scn.player_sprite.ptr, scn.player_sprite.bank, ANIM_SET_DEFAULT, PLAYER.animations);
--        load_bounds(scn.player_sprite.ptr, scn.player_sprite.bank, &PLAYER.bounds);
-+        if (!vm_pop_scene_stack_state) {
-+            load_animations(scn.player_sprite.ptr, scn.player_sprite.bank, ANIM_SET_DEFAULT, PLAYER.animations);
-+            load_bounds(scn.player_sprite.ptr, scn.player_sprite.bank, &PLAYER.bounds);
-+        }
+     #ifdef DISABLE_TILESET_LOAD_ON_TRANSITION
+@@ -248,10 +251,12 @@
+     #endif
+             PLAYER.sprite = scn.player_sprite;
+             UBYTE n_loaded = load_sprite(PLAYER.base_tile = 0, scn.player_sprite.ptr, scn.player_sprite.bank);
+             allocated_sprite_tiles = player_sprite_len = (n_loaded > scn.reserve_tiles) ? n_loaded : scn.reserve_tiles;
+-            load_animations(scn.player_sprite.ptr, scn.player_sprite.bank, ANIM_SET_DEFAULT, PLAYER.animations);
+-            load_bounds(scn.player_sprite.ptr, scn.player_sprite.bank, &PLAYER.bounds);
++            if (!vm_pop_scene_stack_state) {
++                load_animations(scn.player_sprite.ptr, scn.player_sprite.bank, ANIM_SET_DEFAULT, PLAYER.animations);
++                load_bounds(scn.player_sprite.ptr, scn.player_sprite.bank, &PLAYER.bounds);
++            }
+     #ifdef DISABLE_PLAYER_SPRITE_LOAD_ON_TRANSITION
+         }
+     #endif
      } else {
-         // no player on logo, but still some little amount of actors may be present
-         PLAYER.base_tile = allocated_sprite_tiles = 0x68;
-         PLAYER.sprite = spritesheet_none_far;
-@@ -307,25 +312,28 @@
+@@ -323,34 +328,39 @@
                  // exclusive sprites allocated separately to avoid overwriting if modified
                  if (actor->reserve_tiles) load_sprite(actor->base_tile, actor->sprite.ptr, actor->sprite.bank);
              }
@@ -96,14 +96,15 @@ Index: src/core/data_manager.c
      }
  
      // Load triggers
-@@ -333,8 +341,10 @@
+     if (triggers_len != 0) {
          MemcpyBanked(&triggers, scn.triggers.ptr, sizeof(trigger_t) * triggers_len, scn.triggers.bank);
      }
  
+-    metatile_reset();
++    if (!vm_pop_scene_stack_state) {
++        metatile_reset();
++    }
+     scene_transition_reset();
      scroll_reset();
-+    scroll_offset_x = 0;
-+    scroll_offset_y = 0;
-     trigger_reset();
- 
-     emote_actor = NULL;
- 
+     scroll_offset_x = 0;
+     scroll_offset_y = 0;
